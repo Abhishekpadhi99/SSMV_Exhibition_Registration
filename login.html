@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | SSMV</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-100 min-h-screen">
+
+<!-- NAVBAR -->
+<nav class="bg-white shadow">
+    <div class="nav-container mx-auto px-4">
+        <div class="flex items-center h-16">
+            <img src="ssmv logo.jpg" alt="SSMV" class="h-10 w-10 object-contain mr-2">
+            <span class="text-lg font-bold">SSMV</span>
+        </div>
+    </div>
+</nav>
+
+<!-- LOGIN FORM -->
+<div class="flex justify-center items-center px-4 py-16">
+    <div class="bg-white rounded-xl shadow-xl p-6 sm:p-8 w-full max-w-md">
+
+        <div class="text-center mb-6">
+            <div class="bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-lock text-indigo-600 text-2xl"></i>
+            </div>
+            <h2 class="text-2xl font-bold">Admin Login</h2>
+            <p class="text-gray-600 text-sm">Authorized access only</p>
+        </div>
+
+        <!-- ERROR -->
+        <div id="errorMessage" class="hidden mb-4 bg-red-50 border-l-4 border-red-500 p-3">
+            <p id="errorText" class="text-red-700 text-sm"></p>
+        </div>
+
+        <form id="loginForm" class="space-y-5">
+
+            <!-- Username -->
+            <div>
+                <label class="font-semibold text-sm">Username</label>
+                <input id="username" type="text" required
+                       class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                       placeholder="Enter username">
+            </div>
+
+            <!-- Password -->
+            <div>
+                <label class="font-semibold text-sm">Password</label>
+                <div class="relative">
+                    <input id="password" type="password" required
+                           class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                           placeholder="Enter password">
+                    <button type="button"
+                            onclick="togglePassword()"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
+                        <i id="eyeIcon" class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit"
+                    class="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700">
+                <i class="fas fa-sign-in-alt mr-2"></i>
+                Login
+            </button>
+
+        </form>
+
+        <div class="text-center mt-6">
+            <a href="index.html" class="text-indigo-600 text-sm hover:underline">
+                ← Back to Home
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<!-- CALL BUTTON -->
+<a href="tel:9926633224"
+   class="contact-button fixed bottom-6 right-6 bg-green-500 text-white px-6 py-4 rounded-full shadow flex gap-2 items-center z-50">
+    <i class="fas fa-phone-alt"></i>
+    <span>Call</span>
+</a>
+
+<script src="script.js"></script>
+</body>
+</html>

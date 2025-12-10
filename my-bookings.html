@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bookings | SSMV</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-100 min-h-screen">
+
+<!-- NAV -->
+<nav class="bg-white shadow-lg">
+    <div class="nav-container mx-auto px-4">
+        <div class="flex justify-between items-center h-16">
+
+            <div class="flex items-center">
+                <img src="ssmv logo.jpg" class="h-10 w-10 object-contain mr-2" alt="SSMV">
+                <span class="font-bold text-lg">SSMV</span>
+            </div>
+
+            <div class="hidden md:flex space-x-6">
+                <a href="index.html">Home</a>
+                <a href="booking.html">Book</a>
+                <a href="my-bookings.html" class="text-indigo-600 font-semibold">My Bookings</a>
+                <a href="login.html">Admin</a>
+            </div>
+
+            <button class="md:hidden" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+
+        <div id="mobileMenu" class="hidden pb-4">
+            <a class="block py-2" href="index.html">Home</a>
+            <a class="block py-2" href="booking.html">Book</a>
+            <a class="block py-2 font-semibold text-indigo-600" href="my-bookings.html">My Bookings</a>
+            <a class="block py-2" href="login.html">Admin</a>
+        </div>
+    </div>
+</nav>
+
+<!-- CONTENT -->
+<div class="max-w-5xl mx-auto px-4 py-10">
+
+    <h1 class="text-3xl font-bold mb-2">
+        <i class="fas fa-list text-indigo-600 mr-2"></i>
+        My Bookings
+    </h1>
+    <p class="text-gray-600 mb-6">
+        Enter your email or phone number to find your appointment
+    </p>
+
+    <!-- SEARCH -->
+    <div class="bg-white rounded-xl shadow p-6 mb-6">
+        <div class="grid md:grid-cols-2 gap-4">
+            <div>
+                <label class="font-semibold text-sm">Email</label>
+                <input id="searchEmail" type="email"
+                       class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                       placeholder="example@email.com">
+            </div>
+            <div>
+                <label class="font-semibold text-sm">Phone</label>
+                <input id="searchPhone" type="tel"
+                       class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+                       placeholder="9926633224">
+            </div>
+        </div>
+
+        <button onclick="searchBookings()"
+                class="mt-4 bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700">
+            <i class="fas fa-search mr-2"></i>
+            Search
+        </button>
+    </div>
+
+    <!-- RESULTS -->
+    <div id="searchResults" class="hidden">
+
+        <!-- TABLE (DESKTOP) -->
+        <div class="desktop-table bg-white rounded-xl shadow overflow-x-auto mb-6">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="p-3 text-left">Booking ID</th>
+                        <th class="p-3 text-left">Date & Time</th>
+                        <th class="p-3 text-left">People</th>
+                        <th class="p-3 text-left">Details</th>
+                        <th class="p-3 text-left">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="userBookingsTable"></tbody>
+            </table>
+        </div>
+
+        <!-- MOBILE CARDS -->
+        <div class="mobile-cards">
+            <div id="userBookingsCards" class="space-y-4"></div>
+        </div>
+    </div>
+
+    <!-- NO RESULTS -->
+    <div id="noResults"
+         class="hidden bg-white rounded-xl shadow p-8 text-center">
+        <i class="fas fa-search text-gray-400 text-4xl mb-4"></i>
+        <h3 class="text-xl font-bold mb-2">No Bookings Found</h3>
+        <p class="text-gray-600 mb-4">
+            No appointments found using the provided details.
+        </p>
+        <a href="booking.html"
+           class="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg">
+            Book New Appointment
+        </a>
+    </div>
+
+</div>
+
+<!-- CALL BUTTON -->
+<a href="tel:9926633224"
+   class="contact-button fixed bottom-6 right-6 bg-green-500 text-white px-6 py-4 rounded-full shadow flex items-center gap-2 z-50">
+    <i class="fas fa-phone-alt"></i>
+    <span>Call</span>
+</a>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | SSMV</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-100 min-h-screen">
+
+<!-- NAV -->
+<nav class="bg-white shadow-lg">
+    <div class="nav-container mx-auto px-4">
+        <div class="flex justify-between items-center h-16">
+
+            <div class="flex items-center">
+                <img src="ssmv logo.jpg" class="h-10 w-10 object-contain mr-2" alt="SSMV">
+                <span class="font-bold text-lg">SSMV Admin</span>
+            </div>
+
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="index.html">Home</a>
+                <a href="booking.html">Book</a>
+                <a href="my-bookings.html">My Bookings</a>
+                <button onclick="logout()"
+                        class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600">
+                    Logout
+                </button>
+            </div>
+
+            <button class="md:hidden" onclick="toggleMobileMenu()">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+
+        <div id="mobileMenu" class="hidden pb-4">
+            <a class="block py-2" href="index.html">Home</a>
+            <a class="block py-2" href="booking.html">Book</a>
+            <a class="block py-2" href="my-bookings.html">My Bookings</a>
+            <button onclick="logout()"
+                    class="mt-2 w-full bg-red-500 text-white py-2 rounded">
+                Logout
+            </button>
+        </div>
+    </div>
+</nav>
+
+<!-- CONTENT -->
+<div class="max-w-7xl mx-auto px-4 py-8">
+
+    <!-- HEADER -->
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold">
+            <i class="fas fa-chart-line text-indigo-600 mr-2"></i>
+            Admin Dashboard
+        </h1>
+        <p class="text-gray-600">Manage all appointment bookings</p>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-grid grid sm:grid-cols-3 gap-4 mb-8">
+        <div class="bg-white p-6 rounded-xl shadow">
+            <p class="text-gray-600 text-sm">Total Bookings</p>
+            <p id="totalBookings" class="text-3xl font-bold">0</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow">
+            <p class="text-gray-600 text-sm">Today's Appointments</p>
+            <p id="todayBookings" class="text-3xl font-bold">0</p>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow">
+            <p class="text-gray-600 text-sm">Total People</p>
+            <p id="totalPeople" class="text-3xl font-bold">0</p>
+        </div>
+    </div>
+
+    <!-- TABLE -->
+    <div class="bg-white rounded-xl shadow overflow-x-auto">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-100 text-left">
+                <tr>
+                    <th class="p-3">ID</th>
+                    <th class="p-3">Name</th>
+                    <th class="p-3">Date & Time</th>
+                    <th class="p-3">People</th>
+                    <th class="p-3">Contact</th>
+                    <th class="p-3">Details</th>
+                    <th class="p-3">Action</th>
+                </tr>
+            </thead>
+            <tbody id="bookingsTableBody"></tbody>
+        </table>
+    </div>
+
+</div>
+
+<!-- CALL BUTTON -->
+<a href="tel:9926633224"
+   class="contact-button fixed bottom-6 right-6 bg-green-500 text-white px-6 py-4 rounded-full shadow flex items-center gap-2 z-50">
+    <i class="fas fa-phone-alt"></i>
+    <span>Call</span>
+</a>
+
+<script src="script.js"></script>
+</body>
+</html>

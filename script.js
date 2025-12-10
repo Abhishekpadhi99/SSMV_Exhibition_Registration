@@ -1,33 +1,76 @@
 /* =====================================
    CONFIG
 ===================================== */
-const STORAGE_KEY = 'ssmv_bookings';
+const API_BASE = window.location.origin + '/api';
 
-const ADMIN_CREDENTIALS = {
-    username: 'kshatriya302',
-    password: '0978'
-};
+/* =====================================
+   API UTILITIES
+===================================== */
+async function apiCall(endpoint, options = {}) {
+    try {
+        const response = await fetch(`${API_BASE}${endpoint}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                ...options.headers
+            },
+            ...options
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'API request failed');
+        }
+        
+        return await response.json();
+    } catch (error) {
+        console.error('API Error:', error);
+        throw error;
+    }
+}
+
+async function getBookings() {
+    return await apiCall('/bookings');
+}
+
+async function createBooking(bookingData) {
+    return await apiCall('/bookings', {
+        method: 'POST',
+        body: JSON.stringify(bookingData)
+    });
+}
+
+async function deleteBooking(bookingId) {
+    return await apiCall(`/bookings/${bookingId}`, {
+        method: 'DELETE'
+    });
+}
+
+async function searchBookings(email, phone) {
+    return await apiCall('/bookings/search', {
+        method: 'POST',
+        body: JSON.stringify({ email, phone })
+    });
+}
+
+async function adminLogin(username, password) {
+    return await apiCall('/admin/login', {
+        method: 'POST',
+        body: JSON.stringify({ username, password })
+    });
+}
+
+async function getStats() {
+    return await apiCall('/stats');
+}
 
 /* =====================================
    UTILITIES
 ===================================== */
-function getBookings() {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-}
-
-function saveBookings(bookings) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
-}
-
-function generateId() {
-    return Date.now();
-}
-
 function formatTime(time) {
     const [h, m] = time.split(':').map(Number);
     const ampm = h >= 12 ? 'PM' : 'AM';
     const hour = h % 12 || 12;
-    return `${hour}:${m} ${ampm}`;
+    return `${hour}:${m.toString().padStart(2, '0')} ${ampm}`;
 }
 
 function formatDate(dateStr) {
@@ -61,16 +104,19 @@ function logout() {
 ===================================== */
 const loginForm = document.getElementById('loginForm');
 if (loginForm) {
-    loginForm.addEventListener('submit', e => {
+    loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const u = username.value.trim();
-        const p = password.value.trim();
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
 
-        if (u === ADMIN_CREDENTIALS.username && p === ADMIN_CREDENTIALS.password) {
-            localStorage.setItem('adminLoggedIn','true');
-            window.location.href = 'admin.html';
-        } else {
+        try {
+            const result = await adminLogin(username, password);
+            if (result.success) {
+                localStorage.setItem('adminLoggedIn', 'true');
+                window.location.href = 'admin.html';
+            }
+        } catch (error) {
             showError('Invalid username or password');
         }
     });
@@ -107,78 +153,50 @@ if (bookingForm) {
         dateInput.min = new Date().toISOString().split('T')[0];
         dateInput.addEventListener('change', () => {
             const day = new Date(dateInput.value + 'T00:00:00')
-                .toLocaleDateString('en-US',{ weekday:'long' });
+                .toLocaleDateString('en-US', { weekday: 'long' });
             document.getElementById('dayOfWeek').textContent = `Selected day: ${day}`;
         });
     }
 
-    bookingForm.addEventListener('submit', e => {
+    bookingForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const booking = {
-            id: generateId(),
-            name: fullName.value,
-            email: email.value,
-            phone: phone.value,
-            date: appointmentDate.value,
-            time: appointmentTime.value,
-            numberOfPeople: numberOfPeople.value,
-            details: appointmentDetails.value,
-            status: 'confirmed'
+        const bookingData = {
+            name: document.getElementById('fullName').value,
+            email: document.getElementById('email').value,
+            phone: document.getElementById('phone').value,
+            date: document.getElementById('appointmentDate').value,
+            time: document.getElementById('appointmentTime').value,
+            numberOfPeople: document.getElementById('numberOfPeople').value,
+            details: document.getElementById('appointmentDetails').value
         };
 
-        const bookings = getBookings();
-        bookings.push(booking);
-        saveBookings(bookings);
-
-        sendConfirmationEmail(booking);
-        showConfirmation(booking);
-        bookingForm.reset();
-    });
-}
-
-/* =====================================
-   EMAILJS (SAFE)
-===================================== */
-const EMAILJS_PUBLIC_KEY = 'YOUR_EMAILJS_PUBLIC_KEY';
-const EMAILJS_SERVICE_ID = 'YOUR_SERVICE_ID';
-const EMAILJS_TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
-
-if (typeof emailjs !== 'undefined' && !EMAILJS_PUBLIC_KEY.includes('YOUR')) {
-    emailjs.init(EMAILJS_PUBLIC_KEY);
-}
-
-function sendConfirmationEmail(b) {
-    if (typeof emailjs === 'undefined' || EMAILJS_PUBLIC_KEY.includes('YOUR')) return;
-
-    emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-        to_email: b.email,
-        to_name: b.name,
-        appointment_date: formatDate(b.date),
-        appointment_time: formatTime(b.time),
-        number_of_people: b.numberOfPeople,
-        appointment_details: b.details,
-        phone: b.phone,
-        booking_id: b.id
+        try {
+            const booking = await createBooking(bookingData);
+            showConfirmation(booking);
+            bookingForm.reset();
+        } catch (error) {
+            alert('Error creating booking: ' + error.message);
+        }
     });
 }
 
 /* =====================================
    CONFIRMATION MODAL
 ===================================== */
-function showConfirmation(b) {
+function showConfirmation(booking) {
     const modal = document.getElementById('confirmationModal');
     const box = document.getElementById('confirmationDetails');
     if (!modal || !box) return;
 
     box.innerHTML = `
-      <p><b>Name:</b> ${b.name}</p>
-      <p><b>Date:</b> ${formatDate(b.date)}</p>
-      <p><b>Time:</b> ${formatTime(b.time)}</p>
-      <p><b>People:</b> ${b.numberOfPeople}</p>
-      <p><b>Email:</b> ${b.email}</p>
-      <p><b>Phone:</b> ${b.phone}</p>
-      <p><b>Details:</b> ${b.details}</p>
+      <p><b>Name:</b> ${booking.name}</p>
+      <p><b>Date:</b> ${formatDate(booking.date)}</p>
+      <p><b>Time:</b> ${formatTime(booking.time)}</p>
+      <p><b>People:</b> ${booking.numberOfPeople}</p>
+      <p><b>Email:</b> ${booking.email}</p>
+      <p><b>Phone:</b> ${booking.phone}</p>
+      <p><b>Details:</b> ${booking.details}</p>
     `;
     modal.classList.remove('hidden');
 }
@@ -187,22 +205,28 @@ function showConfirmation(b) {
    ADMIN DASHBOARD
 ===================================== */
 if (location.pathname.includes('admin.html')) {
-    if (!isLoggedIn()) location.href = 'login.html';
-    else loadAdmin();
+    if (!isLoggedIn()) {
+        location.href = 'login.html';
+    } else {
+        loadAdmin();
+    }
 }
 
-function loadAdmin() {
-    const bookings = getBookings();
-    const total = bookings.length;
-    const today = new Date().toISOString().split('T')[0];
+async function loadAdmin() {
+    try {
+        // Load stats
+        const stats = await getStats();
+        document.getElementById('totalBookings').textContent = stats.total_bookings;
+        document.getElementById('todayBookings').textContent = stats.today_bookings;
+        document.getElementById('totalPeople').textContent = stats.total_people;
 
-    document.getElementById('totalBookings').textContent = total;
-    document.getElementById('todayBookings').textContent =
-        bookings.filter(b=>b.date===today).length;
-    document.getElementById('totalPeople').textContent =
-        bookings.reduce((s,b)=>s+Number(b.numberOfPeople),0);
-
-    renderAdminTable(bookings);
+        // Load bookings table
+        const bookings = await getBookings();
+        renderAdminTable(bookings);
+    } catch (error) {
+        console.error('Error loading admin data:', error);
+        alert('Error loading admin data');
+    }
 }
 
 function renderAdminTable(bookings) {
@@ -214,7 +238,7 @@ function renderAdminTable(bookings) {
         return;
     }
 
-    tbody.innerHTML = bookings.map(b=>`
+    tbody.innerHTML = bookings.map(b => `
       <tr>
         <td>#${b.id}</td>
         <td>${b.name}</td>
@@ -222,53 +246,117 @@ function renderAdminTable(bookings) {
         <td>${b.numberOfPeople}</td>
         <td>${b.email}<br>${b.phone}</td>
         <td>${b.details}</td>
-        <td><button onclick="deleteBooking(${b.id})">🗑️</button></td>
+        <td><button onclick="deleteBookingAdmin(${b.id})" class="text-red-600 hover:text-red-800">🗑️</button></td>
       </tr>
     `).join('');
 }
 
-function deleteBooking(id) {
-    const filtered = getBookings().filter(b => b.id !== id);
-    saveBookings(filtered);
-    loadAdmin();
+async function deleteBookingAdmin(id) {
+    if (!confirm('Are you sure you want to delete this booking?')) return;
+    
+    try {
+        await deleteBooking(id);
+        loadAdmin(); // Reload the admin panel
+    } catch (error) {
+        alert('Error deleting booking: ' + error.message);
+    }
 }
 
 /* =====================================
    SEARCH (My Bookings)
 ===================================== */
-function searchBookings() {
-    const emailVal = searchEmail.value.trim();
-    const phoneVal = searchPhone.value.trim();
-    const results = getBookings().filter(
-        b => b.email === emailVal || b.phone.includes(phoneVal)
-    );
+async function searchBookings() {
+    const emailVal = document.getElementById('searchEmail').value.trim();
+    const phoneVal = document.getElementById('searchPhone').value.trim();
+    
+    if (!emailVal && !phoneVal) {
+        alert('Please enter email or phone number');
+        return;
+    }
 
-    displayUserBookings(results);
+    try {
+        const results = await searchBookings(emailVal, phoneVal);
+        displayUserBookings(results);
+    } catch (error) {
+        console.error('Search error:', error);
+        displayUserBookings([]);
+    }
 }
 
 function displayUserBookings(list) {
     const table = document.getElementById('userBookingsTable');
     const cards = document.getElementById('userBookingsCards');
+    const noResults = document.getElementById('noResults');
+    const searchResults = document.getElementById('searchResults');
 
+    // Hide no results initially
+    if (noResults) noResults.classList.add('hidden');
+    
     if (!list.length) {
-        document.getElementById('noResults').classList.remove('hidden');
+        if (noResults) noResults.classList.remove('hidden');
+        if (searchResults) searchResults.classList.add('hidden');
         return;
     }
 
-    table.innerHTML = list.map(b=>`
-      <tr>
-        <td>#${b.id}</td>
-        <td>${formatDate(b.date)}<br>${formatTime(b.time)}</td>
-        <td>${b.numberOfPeople}</td>
-        <td>${b.details}</td>
-        <td>Confirmed</td>
-      </tr>
-    `).join('');
+    // Show results
+    if (searchResults) searchResults.classList.remove('hidden');
 
-    cards.innerHTML = list.map(b=>`
-      <div class="booking-card">
-        <b>${formatDate(b.date)} - ${formatTime(b.time)}</b>
-        <p>${b.details}</p>
-      </div>
-    `).join('');
+    // Desktop table
+    if (table) {
+        table.innerHTML = list.map(b => `
+          <tr>
+            <td>#${b.id}</td>
+            <td>${formatDate(b.date)}<br>${formatTime(b.time)}</td>
+            <td>${b.numberOfPeople}</td>
+            <td>${b.details}</td>
+            <td>Confirmed</td>
+          </tr>
+        `).join('');
+    }
+
+    // Mobile cards
+    if (cards) {
+        cards.innerHTML = list.map(b => `
+          <div class="booking-card">
+            <div class="booking-card-header">
+              <b>#${b.id}</b>
+              <span class="text-green-600">Confirmed</span>
+            </div>
+            <div class="booking-field">
+              <span class="booking-field-label">Date & Time:</span>
+              <span class="booking-field-value">${formatDate(b.date)} ${formatTime(b.time)}</span>
+            </div>
+            <div class="booking-field">
+              <span class="booking-field-label">People:</span>
+              <span class="booking-field-value">${b.numberOfPeople}</span>
+            </div>
+            <div class="booking-field">
+              <span class="booking-field-label">Details:</span>
+              <span class="booking-field-value">${b.details}</span>
+            </div>
+          </div>
+        `).join('');
+    }
 }
+
+// Fix the search function name conflict
+window.searchUserBookings = async function() {
+    const emailVal = document.getElementById('searchEmail').value.trim();
+    const phoneVal = document.getElementById('searchPhone').value.trim();
+    
+    if (!emailVal && !phoneVal) {
+        alert('Please enter email or phone number');
+        return;
+    }
+
+    try {
+        const results = await apiCall('/bookings/search', {
+            method: 'POST',
+            body: JSON.stringify({ email: emailVal, phone: phoneVal })
+        });
+        displayUserBookings(results);
+    } catch (error) {
+        console.error('Search error:', error);
+        displayUserBookings([]);
+    }
+};

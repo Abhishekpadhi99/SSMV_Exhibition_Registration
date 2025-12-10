@@ -231,24 +231,67 @@ async function loadAdmin() {
 
 function renderAdminTable(bookings) {
     const tbody = document.getElementById('bookingsTableBody');
-    if (!tbody) return;
-
+    const cards = document.getElementById('adminBookingsCards');
+    
     if (!bookings.length) {
-        tbody.innerHTML = `<tr><td colspan="7" class="text-center p-6">No bookings</td></tr>`;
+        if (tbody) {
+            tbody.innerHTML = `<tr><td colspan="7" class="text-center p-6">No bookings</td></tr>`;
+        }
+        if (cards) {
+            cards.innerHTML = `<div class="bg-white p-8 rounded-xl text-center">
+                <i class="fas fa-calendar-times text-gray-400 text-4xl mb-4"></i>
+                <p class="text-gray-600">No bookings found</p>
+            </div>`;
+        }
         return;
     }
 
-    tbody.innerHTML = bookings.map(b => `
-      <tr>
-        <td>#${b.id}</td>
-        <td>${b.name}</td>
-        <td>${formatDate(b.date)}<br><b>${formatTime(b.time)}</b></td>
-        <td>${b.numberOfPeople}</td>
-        <td>${b.email}<br>${b.phone}</td>
-        <td>${b.details}</td>
-        <td><button onclick="deleteBookingAdmin(${b.id})" class="text-red-600 hover:text-red-800">🗑️</button></td>
-      </tr>
-    `).join('');
+    // Desktop table
+    if (tbody) {
+        tbody.innerHTML = bookings.map(b => `
+          <tr>
+            <td class="p-3">#${b.id}</td>
+            <td class="p-3">${b.name}</td>
+            <td class="p-3">${formatDate(b.date)}<br><b>${formatTime(b.time)}</b></td>
+            <td class="p-3">${b.numberOfPeople}</td>
+            <td class="p-3">${b.email}<br>${b.phone}</td>
+            <td class="p-3">${b.details}</td>
+            <td class="p-3"><button onclick="deleteBookingAdmin(${b.id})" class="text-red-600 hover:text-red-800 text-lg">🗑️</button></td>
+          </tr>
+        `).join('');
+    }
+
+    // Mobile cards
+    if (cards) {
+        cards.innerHTML = bookings.map(b => `
+          <div class="booking-card">
+            <div class="booking-card-header">
+              <b>#${b.id} - ${b.name}</b>
+              <button onclick="deleteBookingAdmin(${b.id})" class="text-red-600 hover:text-red-800 text-lg">🗑️</button>
+            </div>
+            <div class="booking-field">
+              <span class="booking-field-label">Date & Time:</span>
+              <span class="booking-field-value">${formatDate(b.date)} ${formatTime(b.time)}</span>
+            </div>
+            <div class="booking-field">
+              <span class="booking-field-label">People:</span>
+              <span class="booking-field-value">${b.numberOfPeople}</span>
+            </div>
+            <div class="booking-field">
+              <span class="booking-field-label">Email:</span>
+              <span class="booking-field-value">${b.email}</span>
+            </div>
+            <div class="booking-field">
+              <span class="booking-field-label">Phone:</span>
+              <span class="booking-field-value">${b.phone}</span>
+            </div>
+            <div class="booking-field">
+              <span class="booking-field-label">Details:</span>
+              <span class="booking-field-value">${b.details}</span>
+            </div>
+          </div>
+        `).join('');
+    }
 }
 
 async function deleteBookingAdmin(id) {

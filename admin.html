@@ -37,12 +37,12 @@
             </button>
         </div>
 
-        <div id="mobileMenu" class="hidden pb-4">
-            <a class="block py-2" href="index.html">Home</a>
-            <a class="block py-2" href="booking.html">Book</a>
-            <a class="block py-2" href="my-bookings.html">My Bookings</a>
+        <div id="mobileMenu" class="hidden pb-4 md:hidden">
+            <a class="block py-2 px-4 hover:bg-gray-100" href="index.html">Home</a>
+            <a class="block py-2 px-4 hover:bg-gray-100" href="booking.html">Book</a>
+            <a class="block py-2 px-4 hover:bg-gray-100" href="my-bookings.html">My Bookings</a>
             <button onclick="logout()"
-                    class="mt-2 w-full bg-red-500 text-white py-2 rounded">
+                    class="mt-2 mx-4 w-auto bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
                 Logout
             </button>
         </div>
@@ -79,8 +79,8 @@
         </div>
     </div>
 
-    <!-- TABLE -->
-    <div class="bg-white rounded-xl shadow overflow-x-auto">
+    <!-- TABLE (DESKTOP) -->
+    <div class="desktop-table bg-white rounded-xl shadow overflow-x-auto">
         <table class="w-full text-sm">
             <thead class="bg-gray-100 text-left">
                 <tr>
@@ -95,6 +95,11 @@
             </thead>
             <tbody id="bookingsTableBody"></tbody>
         </table>
+    </div>
+
+    <!-- MOBILE CARDS -->
+    <div class="mobile-cards">
+        <div id="adminBookingsCards" class="space-y-4"></div>
     </div>
 
 </div>

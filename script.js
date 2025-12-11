@@ -17,8 +17,14 @@ async function apiCall(endpoint, options = {}) {
         });
         
         if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'API request failed');
+            let errorMessage = 'API request failed';
+            try {
+                const error = await response.json();
+                errorMessage = error.message || error.error || errorMessage;
+            } catch (e) {
+                errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+            }
+            throw new Error(errorMessage);
         }
         
         return await response.json();
@@ -308,23 +314,7 @@ async function deleteBookingAdmin(id) {
 /* =====================================
    SEARCH (My Bookings)
 ===================================== */
-async function searchBookings() {
-    const emailVal = document.getElementById('searchEmail').value.trim();
-    const phoneVal = document.getElementById('searchPhone').value.trim();
-    
-    if (!emailVal && !phoneVal) {
-        alert('Please enter email or phone number');
-        return;
-    }
-
-    try {
-        const results = await searchBookings(emailVal, phoneVal);
-        displayUserBookings(results);
-    } catch (error) {
-        console.error('Search error:', error);
-        displayUserBookings([]);
-    }
-}
+// Remove this duplicate function - it conflicts with the API function
 
 function displayUserBookings(list) {
     const table = document.getElementById('userBookingsTable');
